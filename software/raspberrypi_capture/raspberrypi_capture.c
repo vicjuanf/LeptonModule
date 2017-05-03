@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <linux/spi/spidev.h>
 #include <limits.h>
 #include <math.h>
-#include <cv.h>
+#include <opencv.h>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
@@ -59,6 +59,8 @@ static unsigned int lepton_image[80][80];
 static void stream_web(void){
 	
 	cv::Mat videoFrame(60, 80, CV_32UC1, lepton_image);
+	
+	stream_web.write(videoFrame);
 	
 }
 
@@ -205,17 +207,19 @@ int main(int argc, char *argv[])
 	printf("bits per word: %d\n", bits);
 	printf("max speed: %d Hz (%d KHz)\n", speed, speed/1000);
 	
-	// Set up web stream
+	// Set up web stream with opencv
+	VideoWriter stream_web("/var/www/html/lepton/lepton.avi", CV_FOURCC('M','J','P','G'), 30, Size(80,60));
+
 	
+	while(1){
+		while(transfer(fd)!=59){}
 
-	while(transfer(fd)!=59){}
+		//close(fd);
+		//save_pgm_file();
 
-	close(fd);
-
-	//save_pgm_file();
-	
-	//stream frame on web
-	stream_web();
+		//stream frame on web
+		stream_web();
+	}
 
 	return ret;
 }
