@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 #include <limits.h>
+#include <math.h>
+#include <cv.h>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
@@ -52,6 +54,13 @@ static uint16_t delay;
 #define VOSPI_FRAME_SIZE (164)
 uint8_t lepton_frame_packet[VOSPI_FRAME_SIZE];
 static unsigned int lepton_image[80][80];
+
+
+static void stream_web(void){
+	
+	cv::Mat videoFrame(60, 80, CV_32UC1, lepton_image);
+	
+}
 
 static void save_pgm_file(void)
 {
@@ -195,12 +204,18 @@ int main(int argc, char *argv[])
 	printf("spi mode: %d\n", mode);
 	printf("bits per word: %d\n", bits);
 	printf("max speed: %d Hz (%d KHz)\n", speed, speed/1000);
+	
+	// Set up web stream
+	
 
 	while(transfer(fd)!=59){}
 
 	close(fd);
 
-	save_pgm_file();
+	//save_pgm_file();
+	
+	//stream frame on web
+	stream_web();
 
 	return ret;
 }
